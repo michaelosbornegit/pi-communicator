@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { HostMachines } from "../Types/enums";
-import type { CreateSession, DisplaySession, Session } from "../Types/session";
+import type { CreateSession, DisplaySession, Session } from "../Types/message";
 import pg from "./common";
 dayjs.extend(utc)
 

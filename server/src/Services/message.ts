@@ -1,7 +1,7 @@
 import { insertChromeSession } from "../Models/chrome-session.model";
-import { allSessions, insertSessions, pastDaySessions } from "../Models/session.model";
+import { allSessions, insertSessions, pastDaySessions } from "../Models/messageModel";
 import { HostMachines } from "../Types/enums";
-import type { DisplaySession, CreateChromeSession, Session, CreateSession } from "../Types/session";
+import type { DisplaySession, CreateChromeSession, Session, CreateSession } from "../Types/message";
 
 export class SessionService {
     public async getAll(): Promise<Session[]> {

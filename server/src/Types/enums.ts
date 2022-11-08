@@ -1,1 +1,0 @@
-export type HostMachines = 'WINDOWS' | 'MAC' | 'ANDROID';
