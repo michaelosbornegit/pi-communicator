@@ -1,0 +1,37 @@
+{
+  "name": "technology-activity-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2-runtime start ecosystem.config.js",
+    "start:dev": "concurrently \"nodemon -x tsoa spec-and-routes\" \"nodemon src/index.ts\"",
+    "build": "tsoa spec-and-routes && tsc -p tsconfig.json",
+    "tsoa": "tsoa spec-and-routes",
+    "migrate": "knex migrate:latest",
+    "migrate:make": "knex --client pg migrate:make"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/body-parser": "^1.19.2",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/node": "^18.6.3",
+    "nodemon": "^2.0.19",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@types/pg": "^8.6.5",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.6",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "knex": "^2.2.0",
+    "pg": "^8.7.3",
+    "pm2": "^5.2.2",
+    "tsoa": "^4.1.1"
+  }
+}

@@ -1,0 +1,9 @@
+{
+    "watch": ["src"],
+    "ext": ".ts,.js",
+    "ignore": ["src/oapi"],
+    "execMap": {
+      "ts": "npm run tsoa && ts-node --files ./src/index.ts"
+    }
+  }
+  
