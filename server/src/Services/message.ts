@@ -1,23 +1,17 @@
-import { insertChromeSession } from "../Models/chrome-session.model";
-import { allSessions, insertSessions, pastDaySessions } from "../Models/messageModel";
-import { HostMachines } from "../Types/enums";
-import type { DisplaySession, CreateChromeSession, Session, CreateSession } from "../Types/message";
+import { markMessageRead, messagesToUser } from "../Models/messageModel";
+import { CreateMessage, Message } from "../Types/message";
+import { User } from "../Types/user";
 
-export class SessionService {
-    public async getAll(): Promise<Session[]> {
-        return await allSessions();
+export class MessageService {
+    public async getMessages(to: User['username']): Promise<Message[]> {
+        return await messagesToUser(to);
     }
 
-    public async getPastDaySessions(hostMachine: HostMachines, startTime: number, endTime: number): Promise<DisplaySession> {
-        // TODO if end time is longer than 24 hours throw exception
-        return await pastDaySessions(hostMachine, startTime, endTime);
+    public async sendMessage(message: CreateMessage): Promise<Message['id']> {
+        return await this.sendMessage(message);
     }
     
-    public async create(sessions: CreateSession[]): Promise<void> {
-        await insertSessions(sessions);
-    }
-    
-    public async createChromeSession(session: CreateChromeSession): Promise<void> {
-        await insertChromeSession(session);
+    public async markRead(id: Message['id']): Promise<void> {
+        await markMessageRead(id);
     }
 }

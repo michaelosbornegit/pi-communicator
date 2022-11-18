@@ -1,4 +1,3 @@
-// src/users/usersController.ts
 import {
     Body,
     Controller,
@@ -10,28 +9,28 @@ import {
     Route,
     SuccessResponse,
   } from "tsoa";
-  import type { ChromeSessionBody, DisplaySession, Message, MessageBody, Session, SessionBody } from "../Types/message";
+  import type { CreateMessage, Message } from "../Types/message";
   import { MessageService } from "../Services/message";
 import bodyParser from "body-parser";
-import { HostMachines } from "../Types/enums";
+import { User } from "../Types/user";
   
   @Route("messages")
   @Middlewares(bodyParser.urlencoded({ extended: true }), bodyParser.json())
   export class MessageController extends Controller {
     @Post("/send")
     @SuccessResponse('201', 'Message Sent!')
-    public async sendMessage(@Body() body: MessageBody): Promise<void> {
+    public async sendMessage(@Body() body: CreateMessage): Promise<Message['id']> {
       return await new MessageService().sendMessage(body);
     }
 
     @Get("/")
-    public async getMessages(@Query() to: string): Promise<Message[]> {
-      return await new MessageService().getMessages();
+    public async getMessages(@Query() to: User['username']): Promise<Message[]> {
+      return await new MessageService().getMessages(to);
     }
 
-    @Get("/read")
+    @Post("/read")
     @SuccessResponse('200', 'Session Read')
-    public async postSessions(@Body() body: Message['id']) {
-      await new MessageService().markRead(body.id);
+    public async markMessageRead(@Query() id: Message['id']) {
+      await new MessageService().markRead(id);
     }
 }
