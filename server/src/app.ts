@@ -8,6 +8,7 @@ import { ValidateError } from "tsoa";
 import { createServer } from "http";
 import { RegisterRoutes } from "./oapi/routes";
 import env from "./environment";
+import { ApiError } from "./ApiError";
 
 const app = express();
 const server = createServer(app);
@@ -27,7 +28,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.send("hello, world!");
+  res.send("Go away!");
 });
 
 RegisterRoutes(app);
@@ -45,10 +46,16 @@ app.use(function errorHandler(
       details: err?.fields,
     });
   }
+  if (err instanceof ApiError) {
+    console.log(err.stack);
+    return res.status(err.statusCode).json({
+      message: err.name,
+    });
+  }
   if (err instanceof Error) {
     console.log(err.stack);
     return res.status(500).json({
-      message: "Internal Server Error",
+      message: err.message,
     });
   }
 

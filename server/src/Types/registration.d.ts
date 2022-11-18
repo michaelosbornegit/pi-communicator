@@ -2,6 +2,6 @@ import { User } from "./user";
 
 export type Registration = {
     id?: number;
-    userId?: User['id'];
+    username?: username;
     deviceId: string;
 };

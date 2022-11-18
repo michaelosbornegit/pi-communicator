@@ -8,7 +8,7 @@
 
         table.uuid('userId');
         table.foreign('userId').references('users.id').deferrable('deferred');
-        table.uuid('deviceId').notNullable();
+        table.string('deviceId').notNullable();
     });
   };
   
