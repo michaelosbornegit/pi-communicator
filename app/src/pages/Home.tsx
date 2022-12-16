@@ -1,8 +1,7 @@
-import styled from "@emotion/styled";
-import { Paper, TextField, Typography } from "@mui/material"
+import { Paper, Typography } from "@mui/material"
 import React from "react";
-import SendMessage from "../../features/SendMessage/SendMessage";
-import PastDaySessions from "../../features/SendMessage/SendMessage";
+import NavBar from "../features/NavBar";
+import SendMessage from "../features/SendMessage";
 
 const Home = (): JSX.Element => {
 

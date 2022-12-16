@@ -1,7 +1,14 @@
-import { HostMachines } from '@serverTypes/enums';
-import { DisplaySession } from '@serverTypes/session';
+// import { HostMachines } from '@serverTypes/enums';
+import { Registration } from '@serverTypes/registration';
+import { CreateMessage, Message } from '@serverTypes/message';
 
-const sessionResource = `${process.env.REACT_APP_API_HOST}/session` || '';
+const messageResource = `${process.env.REACT_APP_API_HOST}/messages` || '';
+const registrationResource = `${process.env.REACT_APP_API_HOST}/registration` || '';
+const deviceId = process.env.REACT_APP_DEVICE_ID;
+
+if (!deviceId) {
+  throw new Error('Device id not defined, make sure .env file is valid');
+}
 
 const enrichedFetch = async (
     url: string,
@@ -15,14 +22,28 @@ const enrichedFetch = async (
       if (throwOnError) throw new Error('Failed API Call');
       return response;
     }
-    return response.json();
+    let returnValue;
+    try {
+      returnValue = response.json();
+    } catch (e) {
+      returnValue = response;
+    }
+    return returnValue;
 }
 
-export const getPastDaySessions = (hostMachine: HostMachines, startTime: number, endTime: number): Promise<DisplaySession> => {
+export const register = (): Promise<string> => {
+    return enrichedFetch(`${registrationResource}/`, {
+      method: 'POST',
+      headers: { 'deviceId': deviceId }
+    });
+}
 
-    return enrichedFetch(`${sessionResource}/lastDay?` + new URLSearchParams({
-        hostMachine: hostMachine,
-        startTime: startTime.toString(),
-        endTime: endTime.toString()
-      }));
+export const getMessages = (to: string): Promise<Message[]> => {
+    return enrichedFetch(`${messageResource}?${new URLSearchParams({ to })}`);
+}
+
+export const readMessage = (messageId: number): Promise<void> => {
+  return enrichedFetch(`${messageResource}/read?${new URLSearchParams({ id: String(messageId) })}`, {
+    method: 'POST'
+  });
 }

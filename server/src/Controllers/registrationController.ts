@@ -11,7 +11,6 @@ import {
     SuccessResponse,
   } from "tsoa";
 import bodyParser from "body-parser";
-import { User } from "../Types/user";
 import { RegistrationService } from "../Services/registration";
 import { ApiError } from "../ApiError";
 import { Registration } from "../Types/registration";
@@ -22,7 +21,7 @@ import { validDeviceHashes } from "../validDevices";
   @Middlewares(bodyParser.urlencoded({ extended: true }), bodyParser.json())
   export class RegistrationController extends Controller {
     @Post("/")
-    public async register(@Header() deviceId: string): Promise<User['id']> {
+    public async register(@Header() deviceId: string): Promise<Registration['username']> {
       const hashedDeviceId = md5(deviceId);
       if (!validDeviceHashes.includes(hashedDeviceId)) {
         throw new ApiError('DeviceId not valid', 403);

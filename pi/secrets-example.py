@@ -1,0 +1,4 @@
+ssid = ""
+password = ""
+apiHost = ""
+deviceId = ""

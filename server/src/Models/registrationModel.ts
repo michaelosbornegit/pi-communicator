@@ -8,7 +8,7 @@ dayjs.extend(utc)
 
 const REGISTRATION_TABLE = "device_registration";
 
-export const findOrCreateRegistration = async (deviceId: string): Promise<User['id'] | undefined> => {
+export const findOrCreateRegistration = async (deviceId: string): Promise<Registration['username'] | undefined> => {
     // TOOD refactor these in to a separate generic lookup, then call them from the service layer
     const results = await pg<Registration>(REGISTRATION_TABLE).select().where({ deviceId }).first();
 

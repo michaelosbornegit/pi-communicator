@@ -1,0 +1,28 @@
+version: '2.3'
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: deployment/Dockerfile.nginx
+    restart: unless-stopped
+    ports:
+      - "6600:80"
+  db:
+    build: 
+      dockerfile: Dockerfile.postgres
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "6602:5432"
+    command: -c listen_addresses='*'
+  server:
+    build:
+      context: ../
+      dockerfile: deployment/Dockerfile.server
+    restart: unless-stopped
+    ports:
+      - "6601:6601"
+      
+volumes:
+  postgres-data:

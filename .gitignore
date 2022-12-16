@@ -7,4 +7,5 @@
 **/latestBuild.zip
 **/cache
 
+pi/secrets.py
 server/src/oapi

@@ -1,11 +1,12 @@
-import { User } from './user';
+import { Registration } from "./registration";
 
 export type CreateMessage = {
-    to: User['username'];
-    from: User['username'];
+    to: string;
+    from: string;
+    message: string;
     fetchedAt?: string;
     readAt?: string;
-    read: boolean;
+    read?: boolean = false;
 }
 
 export type Message = CreateMessage & {

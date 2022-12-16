@@ -1,7 +1,9 @@
-import { HostMachines } from '@serverTypes/enums';
-import { DisplaySession } from '@serverTypes/session';
+// import { HostMachines } from '@serverTypes/enums';
+import { Registration } from '@serverTypes/registration';
+import { CreateMessage } from '@serverTypes/message';
 
-const sessionResource = `${process.env.REACT_APP_API_HOST}/session` || '';
+const messageResource = `${process.env.REACT_APP_API_HOST}/messages` || '';
+const registrationResource = `${process.env.REACT_APP_API_HOST}/registration` || '';
 
 const enrichedFetch = async (
     url: string,
@@ -18,11 +20,14 @@ const enrichedFetch = async (
     return response.json();
 }
 
-export const getPastDaySessions = (hostMachine: HostMachines, startTime: number, endTime: number): Promise<DisplaySession> => {
+export const getRegistrations = (): Promise<Registration[]> => {
+    return enrichedFetch(`${registrationResource}/`);
+}
 
-    return enrichedFetch(`${sessionResource}/lastDay?` + new URLSearchParams({
-        hostMachine: hostMachine,
-        startTime: startTime.toString(),
-        endTime: endTime.toString()
-      }));
+export const sendMessage = (message: CreateMessage): Promise<Registration[]> => {
+    return enrichedFetch(`${messageResource}/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(message),
+    });
 }
