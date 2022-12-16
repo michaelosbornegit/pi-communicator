@@ -1,5 +1,4 @@
-import styled from "@emotion/styled";
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material"
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material"
 import React, { useEffect, useState } from "react";
 import { Registration } from "@serverTypes/registration";
 import { getRegistrations } from "../services/api";
