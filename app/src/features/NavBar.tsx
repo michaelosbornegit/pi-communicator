@@ -14,9 +14,6 @@ const pageRoutes: PageRoute[] = [{
     name: 'Home',
     route: '/home'
 }, {
-    name: 'Messages',
-    route: '/messages'
-}, {
     name: 'Registrations',
     route: '/registrations'
 }];
@@ -28,7 +25,7 @@ const NavBar = (): JSX.Element => {
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <Typography>NFT LAB</Typography>
+                    <Typography>GORBY COMM</Typography>
                     {pageRoutes.map((page) => (
                         <MenuItem key={page.name} onClick={() => navigate(page.route)}>
                             <Typography textAlign="center">{page.name}</Typography>

@@ -8,7 +8,7 @@ const Home = (): JSX.Element => {
     <>
       <Paper sx={{ padding: '50px' }}>
         <Typography variant="h2">
-          Welcome to NFT Lab
+          Welcome to GORBY communicator
         </Typography>
         <SendMessage />
       </Paper>

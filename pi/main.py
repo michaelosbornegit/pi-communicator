@@ -17,9 +17,10 @@ button = Pin(13, Pin.IN, Pin.PULL_UP)
 motor1a = Pin(14, Pin.OUT)
 motor1b = Pin(15, Pin.OUT)
 
-# TODO add multiple networks to try to connect to
-ssid = secrets.ssid
-password = secrets.password
+ssidPrimary = secrets.ssidPrimary
+passwordPrimary = secrets.passwordPrimary
+ssidSecondary = secrets.ssidSecondary
+passwordSecondary = secrets.passwordSecondary
 apiHost = secrets.apiHost
 deviceId = secrets.deviceId
 registrationResource = f'{secrets.apiHost}/registration'
@@ -70,13 +71,22 @@ def printToScreenRaw(content):
 def connectToNetwork():
     wlan.active(True)
     wlan.config(pm = 0xa11140)  # Disable power-save mode
-    printToScreenBreakLines(f'Connecting to: \n{ssid}...')
-    wlan.connect(ssid, password)
+    wlan.connect(ssidPrimary, passwordPrimary)
 
     max_wait = 10
     while max_wait > 0:
         if wlan.status() < 0 or wlan.status() >= 3:
             break
+        printToScreenBreakLines(f'Connecting to: \n{ssidPrimary}...')
+        max_wait -= 1
+        time.sleep(1)
+
+    wlan.connect(ssidSecondary, passwordSecondary)
+    max_wait = 10
+    while max_wait > 0:
+        if wlan.status() < 0 or wlan.status() >= 3:
+            break
+        printToScreenBreakLines(f'Connecting to: \n{ssidSecondary}...')
         max_wait -= 1
         time.sleep(1)
 
