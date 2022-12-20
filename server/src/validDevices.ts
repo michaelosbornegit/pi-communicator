@@ -2,6 +2,6 @@
 // Copy this file and name it validDevices.ts and insert your real values 
 export const validDeviceHashes = [
     'f85508d94fc66cc156ceecfbd64b33eb',
-    '18126e7bd3f84b3f3e4df094def5b7de'
+    '06229920d5b6da4cd4242f1d422321b3'
 ];
     

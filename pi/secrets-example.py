@@ -1,4 +1,6 @@
-ssid = ""
-password = ""
+ssidPrimary = ""
+passwordPrimary = ""
+ssidSecondary = ""
+passwordSecondary = ""
 apiHost = ""
 deviceId = ""

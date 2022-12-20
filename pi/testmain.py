@@ -81,14 +81,15 @@ def connectToNetwork():
         max_wait -= 1
         time.sleep(1)
 
-    wlan.connect(ssidSecondary, passwordSecondary)
-    max_wait = 10
-    while max_wait > 0:
-        if wlan.status() < 0 or wlan.status() >= 3:
-            break
-        printToScreenBreakLines(f'Connecting to: \n{ssidSecondary}...')
-        max_wait -= 1
-        time.sleep(1)
+    if wlan.status() < 0 or wlan.status() > 3:
+        wlan.connect(ssidSecondary, passwordSecondary)
+        max_wait = 10
+        while max_wait > 0:
+            if wlan.status() < 0 or wlan.status() >= 3:
+                break
+            printToScreenBreakLines(f'Connecting to: \n{ssidSecondary}...')
+            max_wait -= 1
+            time.sleep(1)
 
     if wlan.status() != 3:
         printToScreenBreakLines('Network connection failed, are you within range of wifi?')
@@ -171,6 +172,7 @@ def main():
                     res = requests.post(registrationResource, headers = { 'deviceId': deviceId })
                     # TODO add cases for server not found, and nice error messages
                     if res.status_code is 403:
+                        print(res.text)
                         printToScreenBreakLines('Device not registered, ask for help')
                     else:
                         username = res.text.replace('"', '')
