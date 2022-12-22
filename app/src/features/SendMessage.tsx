@@ -72,6 +72,14 @@ const SendMessage = (): JSX.Element => {
         setMessage(processedMessage);
     }
 
+    const formatFrom = (from: string) => {
+        if (from.length > 9) {
+            setFrom(from.substring(0, 9));
+        } else {
+            setFrom(from);
+        }
+    }
+
     useEffect(() => {
         if (registrations.length === 0) {
             getRegistrations().then((fetched) => {
@@ -117,8 +125,7 @@ const SendMessage = (): JSX.Element => {
                 <TextField
                     label="From"
                     value={from}
-                    onChange={(e) => setFrom(e.target.value)}
-                    inputProps={{ maxLength: 9 }}
+                    onChange={(e) => formatFrom(e.target.value)}
                 />
                 <Button variant="outlined" onClick={() => { handleMessageSend() }}>Send Message!</Button>
             </FormContainer>
