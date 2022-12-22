@@ -38,6 +38,7 @@ unreadMessages = False
 inactivityTimeout = 5
 motorInterval = 10
 fetchInterval = 20
+fetchTimer = 0
 
 
 def printToScreenBreakLines(content, centered = False):
@@ -111,7 +112,7 @@ def connectToNetwork():
         print('ip = ' + status[0])
 
 def button_pressed(event):
-    global lastTime, readingMessages, messages, inactivityCounter, newTime, unreadMessages
+    global lastTime, readingMessages, messages, inactivityCounter, newTime, unreadMessages, fetchTimer
     newTime = utime.ticks_ms()
     if (newTime - lastTime) > 300 and button.value() is 0:
         lastTime = newTime
@@ -119,30 +120,31 @@ def button_pressed(event):
         # micropython.mem_info()
         if readingMessages:
             if len(messages) > 0:
-                printToScreenBreakLines(f'Sending read receipt...\n{len(messages)-1}\nmessages left', True)
+                printToScreenBreakLines(f'Sending read receipt...\n{len(messages)-1}\nmessage(s) left', True)
                 overlayTextBottom('Loading')
                 res = requests.post(f'{messagesResource}/read?id={messages[0]["id"]}')
                 # error handling
                 res.close()
                 if len(messages) > 1:
-                    printToScreenBreakLines(f'{messages[1]["message"]}\nfrom: {messages[1]["from"]}')
+                    printToScreenRaw(f'{messages[1]["message"]}\nfrom: {messages[1]["from"]}')
                     messages.pop(0)
                 else:
                     printToScreenBreakLines('No new messages\n:(', True)
                     unreadMessages = False
                     messages.pop(0)
                     readingMessages = False
+                    fetchTimer = fetchInterval - 1
         elif len(messages) > 0:
-            printToScreenBreakLines(f'{messages[0]["message"]}\nfrom: {messages[0]["from"]}')
+            printToScreenRaw(f'{messages[0]["message"]}\nfrom: {messages[0]["from"]}')
         readingMessages = True
 
 
 
 def main():
-    global readingMessages, messages, inactivityCounter, unreadMessages
+    global readingMessages, messages, inactivityCounter, unreadMessages, fetchTimer
     username = ''
     motorTimer = 0
-    fetchTimer = fetchInterval
+    fetchTimer = fetchInterval - 5
 
     printToScreenBreakLines('Connecting to network...')
     connectToNetwork()
@@ -174,8 +176,7 @@ def main():
                         else:
                             printToScreenBreakLines('No new messages\n:(', True)
                             unreadMessages = False
-                            fetchTimer += 1
-
+                        fetchTimer += 1
                 else:
                     printToScreenBreakLines(f'Registering device with secret:\n{deviceId}', True)
                     overlayTextBottom('Loading')
@@ -198,6 +199,7 @@ def main():
                 motor1b.low()
                 motorTimer = 0
         except Exception as err:
+            print(err)
             printToScreenBreakLines(f'Error: {err}')
         # TODO do something for the heartbeat, refresh a character on the screen?
         time.sleep(1)  
