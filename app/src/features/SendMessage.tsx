@@ -55,7 +55,8 @@ const SendMessage = (): JSX.Element => {
                         // Put last word on new line
                         const slicedWord = words[words.length - 1];
                         words = words.slice(0, -1);
-                        lines[i + 1] = slicedWord + (lines[i + 1] || '');
+                        const space = lines[i + 1] ? ' ' : '';
+                        lines[i + 1] = slicedWord + space + (lines[i + 1] || '');
                         lines[i] = words.join(' ');
                     } else {
                         const extra = line.substring(16);
@@ -66,9 +67,7 @@ const SendMessage = (): JSX.Element => {
             }
         }
         const firstLines = lines.slice(0, 4)
-        const processedMessage = firstLines.join('\n');
-        console.log(processedMessage);
-        
+        const processedMessage = firstLines.join('\n');  
 
         setMessage(processedMessage);
     }

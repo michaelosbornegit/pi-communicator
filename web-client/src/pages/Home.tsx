@@ -53,7 +53,6 @@ ${messages.current[0].from}`);
     }
     
     const newIntervalId = setInterval(async function() {
-      console.log('Mike');
       if (readingMessages.current) {
         inactivityCounter.current = inactivityCounter.current + 1;
         if (inactivityCounter.current > inactivityTimeout) {
