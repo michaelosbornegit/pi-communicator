@@ -5,6 +5,7 @@ import { Button, FormControl, InputLabel, MenuItem, Select, TextField, Typograph
 import { Registration } from '@serverTypes/registration';
 import { getRegistrations, sendMessage } from "../services/api";
 import styled from "@emotion/styled";
+import { fontFamily } from "@mui/system";
 dayjs.extend(utc)
 
 const Container = styled('div')({
@@ -121,6 +122,8 @@ const SendMessage = (): JSX.Element => {
                     rows={4}
                     value={message}
                     onChange={(e) => formatMessage(e.target.value)}
+                    inputProps={{style: { fontFamily: 'monospace' }}}
+                    // sx={{ fontFamily: 'monospace' }}
                 />
                 <TextField
                     label="From"
