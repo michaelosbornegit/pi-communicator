@@ -123,7 +123,6 @@ const SendMessage = (): JSX.Element => {
                     value={message}
                     onChange={(e) => formatMessage(e.target.value)}
                     inputProps={{style: { fontFamily: 'monospace' }}}
-                    // sx={{ fontFamily: 'monospace' }}
                 />
                 <TextField
                     label="From"
