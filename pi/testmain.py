@@ -34,38 +34,58 @@ messages = []
 lastTime = 0
 newTime = 0
 readingMessages = False
+unreadMessages = False
 inactivityTimeout = 5
-motorInterval = 5
+motorInterval = 10
+fetchInterval = 20
 
 
-def printToScreenBreakLines(content):
+def printToScreenBreakLines(content, centered = False):
     display.fill(0)
-    split = content.split()
+    splitOnNewlines = content.split('\n')
+    # print(splitOnNewlines)
     lineCounter = 0
-    currentLine = ''
-    lineLengthCounter = 0
-    for word in split:
-        wordSpace = f'{word} '
-        lineLengthCounter += len(wordSpace)
-        if (lineLengthCounter > 16):
-            display.text(currentLine, 0, lineCounter * 12, 1)
-            lineCounter += 1
-            currentLine = wordSpace
-            lineLengthCounter = len(wordSpace)
-        else:
-            currentLine += wordSpace
-        
-    display.text(currentLine, 0, lineCounter * 12, 1)
+    for line in splitOnNewlines:
+        needsNewLine = False
+        currentLine = ''
+        lineLengthCounter = 0
+        split = line.split()
+        for word in split:
+            wordSpace = f'{word} '
+            lineLengthCounter += len(wordSpace)
+            if (lineLengthCounter > 16):
+                display.text(f'{currentLine : ^16}' if centered else currentLine, 0, lineCounter * 12, 1)
+                lineCounter += 1
+                currentLine = wordSpace
+                lineLengthCounter = len(wordSpace)
+                needsNewLine = False
+            else:
+                currentLine += wordSpace
+                needsNewLine = True
+        display.text(f'{currentLine : ^16}' if centered else currentLine, 0, lineCounter * 12, 1)
+        lineCounter += 1
+        # if needsNewLine and lineCounter is not 0:
+        #     lineCounter += 1
+        # # remove unnecessary extra new line
+        # print(currentLine)
+        # print(needsNewLine)
+        # print(lineCounter)
+            
     display.show()
 
-def printToScreenRaw(content):
-    display.fill(1)
+def printToScreenRaw(content, centered = False):
+    display.fill(0)
     split = content.split('\n')
     lineCounter = 0
     for line in split:
-        display.text(line, 0, lineCounter * 12, 0)
+        display.text(f'{line : ^16}' if centered else line, 0, lineCounter * 12, 1)
         lineCounter += 1
         
+    display.show()
+
+def overlayTextBottom(text):
+    display.fill_rect(0, 4*12 - 1, 128, 12, 1)
+    display.text(f'{text : ^16}', 0, 4 * 12, 0)
     display.show()
 
 def connectToNetwork():
@@ -77,7 +97,7 @@ def connectToNetwork():
     while max_wait > 0:
         if wlan.status() < 0 or wlan.status() >= 3:
             break
-        printToScreenBreakLines(f'Connecting to: \n{ssidPrimary}...')
+        printToScreenBreakLines(f'Connecting to:\n{ssidPrimary}...')
         max_wait -= 1
         time.sleep(1)
 
@@ -87,7 +107,7 @@ def connectToNetwork():
         while max_wait > 0:
             if wlan.status() < 0 or wlan.status() >= 3:
                 break
-            printToScreenBreakLines(f'Connecting to: \n{ssidSecondary}...')
+            printToScreenBreakLines(f'Connecting to: {ssidSecondary}...')
             max_wait -= 1
             time.sleep(1)
 
@@ -99,23 +119,8 @@ def connectToNetwork():
         status = wlan.ifconfig()
         print('ip = ' + status[0])
 
-
-# async def buttonListener():
-#     print('Listening for button presses')
-#     currentValue = 0
-#     pressedTimes = 0
-#     while True:
-        
-#         if currentValue is 0 and button.value() is 1:
-#             pressedTimes+=1
-#             print(pressedTimes)
-#             currentValue = 1
-#         if currentValue is 1 and button.value() is 0:
-#             currentValue = 0
-#         time.sleep_ms(50)
-
-def button_pressed(change):
-    global lastTime, readingMessages, messages, inactivityCounter, newTime
+def button_pressed(event):
+    global lastTime, readingMessages, messages, inactivityCounter, newTime, unreadMessages
     newTime = utime.ticks_ms()
     if (newTime - lastTime) > 300 and button.value() is 0:
         lastTime = newTime
@@ -123,28 +128,30 @@ def button_pressed(change):
         # micropython.mem_info()
         if readingMessages:
             if len(messages) > 0:
+                printToScreenBreakLines(f'Sending read receipt...\n{len(messages)-1}\nmessages left', True)
+                overlayTextBottom('Loading')
                 res = requests.post(f'{messagesResource}/read?id={messages[0]["id"]}')
-                # error handl33ing
+                # error handling
                 res.close()
                 if len(messages) > 1:
-                    printToScreenBreakLines(f'{messages[1]["message"]} from: {messages[1]["from"]}')
+                    printToScreenBreakLines(f'{messages[1]["message"]}\nfrom: {messages[1]["from"]}')
                     messages.pop(0)
                 else:
-                    printToScreenBreakLines('No new messages... \n:(')
+                    printToScreenBreakLines('No new messages\n:(', True)
+                    unreadMessages = False
                     messages.pop(0)
                     readingMessages = False
         elif len(messages) > 0:
-            printToScreenBreakLines(f'{messages[0]["message"]} from: {messages[0]["from"]}')
+            printToScreenBreakLines(f'{messages[0]["message"]}\nfrom: {messages[0]["from"]}')
         readingMessages = True
 
 
 
 def main():
-    global readingMessages, messages, inactivityCounter
+    global readingMessages, messages, inactivityCounter, unreadMessages
     username = ''
     motorTimer = 0
-
-    
+    fetchTimer = fetchInterval
 
     printToScreenBreakLines('Connecting to network...')
     connectToNetwork()
@@ -156,19 +163,33 @@ def main():
                 if (inactivityCounter > inactivityTimeout):
                     readingMessages = False
                     inactivityCounter = 0
+                    motorTimer = 0
+                    fetchTimer = 0
             else:
                 if username is not '':
-                    newMessages = requests.get(f'{messagesResource}?to={username}')
-                    # TODO error handling...
-                    messages = newMessages.json()
-                    newMessages.close()
-                    if not readingMessages:
-                        if len(messages) > 0:
-                            printToScreenBreakLines('You have new messages!')
-                            motorTimer += 1
-                        else:
-                            printToScreenBreakLines('No new messages... \n:(')
+                    if fetchTimer > fetchInterval:
+                        fetchTimer = 0
+                        overlayTextBottom('Loading')
+                        newMessages = requests.get(f'{messagesResource}?to={username}')
+                        # TODO error handling...
+                        messages = newMessages.json()
+                        newMessages.close()
+                        if not readingMessages:
+                            if len(messages) > 0:
+                                printToScreenBreakLines(f'You have\n\n{len(messages)} \n\nnew message(s)!', True)
+                                unreadMessages = True
+                            else:
+                                printToScreenBreakLines('No new messages\n:(', True)
+                                unreadMessages = False
+                    else:
+                        if not readingMessages:
+                            fetchTimer += 1
+                            if unreadMessages:
+                                motorTimer += 1
+
                 else:
+                    printToScreenBreakLines(f'Registering device with secret:\n{deviceId}', True)
+                    overlayTextBottom('Loading')
                     res = requests.post(registrationResource, headers = { 'deviceId': deviceId })
                     # TODO add cases for server not found, and nice error messages
                     if res.status_code is 403:
@@ -176,6 +197,7 @@ def main():
                         printToScreenBreakLines('Device not registered, ask for help')
                     else:
                         username = res.text.replace('"', '')
+                        printToScreenBreakLines(f'Successfully registered! \nUsername: \n{username}', True)
                         print(username)
                     res.close()
 
@@ -187,9 +209,7 @@ def main():
                 motor1b.low()
                 motorTimer = 0
         except Exception as err:
-            print(type(err))
-            print(err)
-            printToScreenBreakLines('An error occurred')
+            printToScreenBreakLines(f'Error: {err}')
         # TODO do something for the heartbeat, refresh a character on the screen?
         time.sleep(1)  
 
