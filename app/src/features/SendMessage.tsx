@@ -7,11 +7,18 @@ import { getRegistrations, sendMessage } from "../services/api";
 import styled from "@emotion/styled";
 dayjs.extend(utc)
 
-const SendContainer = styled('div')({
+const Container = styled('div')({
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
-  });
+    alignItems: 'center',
+})
+
+const FormContainer = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    minWidth: '16em'
+});
 
 const SendMessage = (): JSX.Element => {
     const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -27,7 +34,7 @@ const SendMessage = (): JSX.Element => {
         // TODO throw if fields aren't filled
         if (!usernameTo || !from || !message) {
             throw new Error('Required Fields not filled out');
-            
+
         }
         sendMessage({
             to: usernameTo,
@@ -35,6 +42,36 @@ const SendMessage = (): JSX.Element => {
             message
         })
     };
+
+    const formatMessage = (message: string) => {
+        const lines = message.split('\n');
+        for (let i = 0; i < 4; i++) {
+            if (lines[i]) {
+                let line = lines[i];
+                if (line.length > 16) {
+                    // Too long for display, try to split on spaces
+                    let words = line.split(' ');
+                    if (words.length > 1) {
+                        // Put last word on new line
+                        const slicedWord = words[words.length - 1];
+                        words = words.slice(0, -1);
+                        lines[i + 1] = slicedWord + (lines[i + 1] || '');
+                        lines[i] = words.join(' ');
+                    } else {
+                        const extra = line.substring(16);
+                        lines[i] = line.substring(0, 16)
+                        lines[i + 1] = extra + (lines[i + 1] || '');
+                    }
+                }
+            }
+        }
+        const firstLines = lines.slice(0, 4)
+        const processedMessage = firstLines.join('\n');
+        console.log(processedMessage);
+        
+
+        setMessage(processedMessage);
+    }
 
     useEffect(() => {
         if (registrations.length === 0) {
@@ -48,43 +85,45 @@ const SendMessage = (): JSX.Element => {
     }, [registrations]);
 
     return (
-        <>
-            <Typography variant="h4">Recipient:</Typography>
-            <FormControl fullWidth>
-                <InputLabel>User</InputLabel>
-                <Select
-                    value={usernameTo}
-                    label="User"
-                    onChange={(e) => handleUserChange(e)}
-                >
-                    {
-                        registrations.map((registration) => {
-                            if (registration.username) {
-                                return <MenuItem key={registration.username} value={registration.username}>{registration.username}</MenuItem>
-                            }
-                            return <></>
-                        })
-                    }
-                </Select>
-            </FormControl>
-            <Typography variant="h4">Message:</Typography>
-            <SendContainer>
-            <TextField
-                label="Enter your message"
-                multiline
-                rows={4}
-                sx={{width: '20rem'}}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-            />
-            <TextField
-                label="From"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-            />
-            <Button variant="outlined" onClick={() => {handleMessageSend()}}>Send Message!</Button>
-            </SendContainer>
-        </>
+        <Container>
+            <Typography>Recipient:</Typography>
+            <FormContainer>
+                <FormControl fullWidth>
+                    <InputLabel>User</InputLabel>
+                    <Select
+                        value={usernameTo}
+                        label="User"
+                        onChange={(e) => handleUserChange(e)}
+                    >
+                        {
+                            registrations.map((registration) => {
+                                if (registration.username) {
+                                    return <MenuItem key={registration.username} value={registration.username}>{registration.username}</MenuItem>
+                                }
+                                return <></>
+                            })
+                        }
+                    </Select>
+                </FormControl>
+            </FormContainer>
+            <Typography>Message:</Typography>
+            <FormContainer>
+                <TextField
+                    label="Enter your message"
+                    multiline
+                    rows={4}
+                    value={message}
+                    onChange={(e) => formatMessage(e.target.value)}
+                />
+                <TextField
+                    label="From"
+                    value={from}
+                    onChange={(e) => setFrom(e.target.value)}
+                    inputProps={{ maxLength: 9 }}
+                />
+                <Button variant="outlined" onClick={() => { handleMessageSend() }}>Send Message!</Button>
+            </FormContainer>
+        </Container>
     );
 }
 

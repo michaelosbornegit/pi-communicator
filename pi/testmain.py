@@ -46,7 +46,6 @@ def printToScreenBreakLines(content, centered = False):
     # print(splitOnNewlines)
     lineCounter = 0
     for line in splitOnNewlines:
-        needsNewLine = False
         currentLine = ''
         lineLengthCounter = 0
         split = line.split()
@@ -58,18 +57,10 @@ def printToScreenBreakLines(content, centered = False):
                 lineCounter += 1
                 currentLine = wordSpace
                 lineLengthCounter = len(wordSpace)
-                needsNewLine = False
             else:
                 currentLine += wordSpace
-                needsNewLine = True
         display.text(f'{currentLine : ^16}' if centered else currentLine, 0, lineCounter * 12, 1)
         lineCounter += 1
-        # if needsNewLine and lineCounter is not 0:
-        #     lineCounter += 1
-        # # remove unnecessary extra new line
-        # print(currentLine)
-        # print(needsNewLine)
-        # print(lineCounter)
             
     display.show()
 
@@ -174,18 +165,16 @@ def main():
                         # TODO error handling...
                         messages = newMessages.json()
                         newMessages.close()
-                        if not readingMessages:
-                            if len(messages) > 0:
-                                printToScreenBreakLines(f'You have\n\n{len(messages)} \n\nnew message(s)!', True)
-                                unreadMessages = True
-                            else:
-                                printToScreenBreakLines('No new messages\n:(', True)
-                                unreadMessages = False
-                    else:
-                        if not readingMessages:
+
+                    if not readingMessages:
+                        if len(messages) > 0:
+                            printToScreenBreakLines(f'You have\n\n{len(messages)} \n\nnew message(s)!', True)
+                            unreadMessages = True
+                            motorTimer += 1
+                        else:
+                            printToScreenBreakLines('No new messages\n:(', True)
+                            unreadMessages = False
                             fetchTimer += 1
-                            if unreadMessages:
-                                motorTimer += 1
 
                 else:
                     printToScreenBreakLines(f'Registering device with secret:\n{deviceId}', True)
