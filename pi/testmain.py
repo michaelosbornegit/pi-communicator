@@ -37,7 +37,7 @@ readingMessages = False
 unreadMessages = False
 inactivityTimeout = 5
 motorInterval = 10
-fetchInterval = 20
+fetchInterval = 30
 fetchTimer = 0
 
 
@@ -129,14 +129,16 @@ def button_pressed(event):
                     printToScreenRaw(f'{messages[1]["message"]}\nfrom: {messages[1]["from"]}')
                     messages.pop(0)
                 else:
-                    printToScreenBreakLines('No new messages\n:(', True)
+                    printToScreenBreakLines('No new m essages\n:(', True)
                     unreadMessages = False
                     messages.pop(0)
                     readingMessages = False
-                    fetchTimer = fetchInterval - 1
+                    fetchTimer = fetchInterval + 1
         elif len(messages) > 0:
             printToScreenRaw(f'{messages[0]["message"]}\nfrom: {messages[0]["from"]}')
-        readingMessages = True
+            readingMessages = True
+        else:
+            fetchTimer = fetchInterval
 
 
 
@@ -144,7 +146,7 @@ def main():
     global readingMessages, messages, inactivityCounter, unreadMessages, fetchTimer
     username = ''
     motorTimer = 0
-    fetchTimer = fetchInterval - 5
+    fetchTimer = fetchInterval + 1
 
     printToScreenBreakLines('Connecting to network...')
     connectToNetwork()
@@ -190,6 +192,7 @@ def main():
                         printToScreenBreakLines(f'Successfully registered! \nUsername: \n{username}', True)
                         print(username)
                     res.close()
+                    time.sleep(3)
 
             if (motorTimer > motorInterval):
                 motor1a.high()
