@@ -73,8 +73,8 @@ const SendMessage = (): JSX.Element => {
     }
 
     const formatFrom = (from: string) => {
-        if (from.length > 9) {
-            setFrom(from.substring(0, 9));
+        if (from.length > 10) {
+            setFrom(from.substring(0, 10));
         } else {
             setFrom(from);
         }
